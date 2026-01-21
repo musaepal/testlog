@@ -204,10 +204,11 @@ if status_filter:
     display_df = display_df[display_df['status'].isin(status_filter)]
 
 # Show data table
+display_columns = ['timestamp', 'method', 'path', 'status', 'bytes', 'rt', 'uct', 'uht', 'urt']
+available_display_columns = [col for col in display_columns if col in display_df.columns]
+
 st.dataframe(
-    display_df[[
-        'timestamp', 'method', 'path', 'status', 'rt', 'uct', 'uht', 'urt'
-    ]].head(100),
+    display_df[available_display_columns].head(100),
     use_container_width=True,
     height=400
 )
