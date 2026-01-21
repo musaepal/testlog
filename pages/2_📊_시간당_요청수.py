@@ -60,7 +60,7 @@ with st.sidebar:
 
     time_interval = st.selectbox(
         'Time Interval',
-        ['Hour', 'Minute (10min)', 'Minute (5min)', 'Minute (1min)'],
+        ['Minute (1min)', 'Minute (5min)', 'Minute (10min)', 'Hour'],
         index=0
     )
 
@@ -74,18 +74,18 @@ df_filtered['date'] = df_filtered['timestamp'].dt.date
 df_filtered['hour_of_day'] = df_filtered['timestamp'].dt.hour
 
 # Apply time interval
-if time_interval == 'Hour':
-    df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('H')
-    interval_label = 'Hour'
-elif time_interval == 'Minute (10min)':
-    df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('10min')
-    interval_label = '10 Minutes'
+if time_interval == 'Minute (1min)':
+    df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('1min')
+    interval_label = '1 Minute'
 elif time_interval == 'Minute (5min)':
     df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('5min')
     interval_label = '5 Minutes'
-else:  # 1min
-    df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('1min')
-    interval_label = '1 Minute'
+elif time_interval == 'Minute (10min)':
+    df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('10min')
+    interval_label = '10 Minutes'
+else:  # Hour
+    df_filtered['time_bucket'] = df_filtered['timestamp'].dt.floor('H')
+    interval_label = 'Hour'
 
 # Summary statistics
 st.header('📊 Summary Statistics')
@@ -184,32 +184,39 @@ with col2:
         status_counts.columns = ['status', 'count']
         status_counts['status'] = status_counts['status'].astype(str)
 
+        # Sort by status code
+        status_counts = status_counts.sort_values('status')
+
         # Color mapping for status codes
-        color_map = {}
+        colors = []
         for status in status_counts['status']:
             if status.startswith('2'):
-                color_map[status] = '#2ca02c'  # green for 2xx
+                colors.append('#2ca02c')  # green for 2xx
             elif status.startswith('3'):
-                color_map[status] = '#1f77b4'  # blue for 3xx
+                colors.append('#1f77b4')  # blue for 3xx
             elif status.startswith('4'):
-                color_map[status] = '#ff7f0e'  # orange for 4xx
+                colors.append('#ff7f0e')  # orange for 4xx
             elif status.startswith('5'):
-                color_map[status] = '#d62728'  # red for 5xx
+                colors.append('#d62728')  # red for 5xx
             else:
-                color_map[status] = '#7f7f7f'  # gray for others
+                colors.append('#7f7f7f')  # gray for others
 
-        fig_status = px.bar(
-            status_counts,
-            x='status',
-            y='count',
-            title='Requests by Status Code',
-            color='status',
-            color_discrete_map=color_map
-        )
+        fig_status = go.Figure(data=[
+            go.Bar(
+                x=status_counts['status'],
+                y=status_counts['count'],
+                marker_color=colors,
+                text=status_counts['count'],
+                textposition='auto',
+                hovertemplate='<b>Status Code: %{x}</b><br>Count: %{y}<extra></extra>'
+            )
+        ])
 
         fig_status.update_layout(
+            title='Requests by Status Code',
             xaxis_title='Status Code',
             yaxis_title='Request Count',
+            xaxis=dict(type='category'),  # Force categorical axis
             showlegend=False
         )
 
@@ -294,16 +301,22 @@ if 'path' in df_filtered.columns:
 else:
     st.info('No path data available')
 
-# Peak hours table
+# Peak traffic periods table
 st.markdown('---')
-st.header('⏰ Peak Traffic Hours')
+st.header(f'⏰ Peak Traffic Periods ({interval_label})')
 
-peak_hours = hourly_counts.sort_values(ascending=False).head(10).reset_index()
-peak_hours.columns = ['timestamp', 'request_count']
-peak_hours['hour'] = peak_hours['timestamp'].dt.strftime('%Y-%m-%d %H:00')
+# Calculate peak periods based on selected interval
+peak_periods = df_filtered.groupby('time_bucket').size().sort_values(ascending=False).head(20).reset_index()
+peak_periods.columns = ['timestamp', 'request_count']
+
+# Format timestamp based on interval
+if time_interval == 'Hour':
+    peak_periods['period'] = peak_periods['timestamp'].dt.strftime('%Y-%m-%d %H:00')
+else:
+    peak_periods['period'] = peak_periods['timestamp'].dt.strftime('%Y-%m-%d %H:%M')
 
 st.dataframe(
-    peak_hours[['hour', 'request_count']],
+    peak_periods[['period', 'request_count']],
     use_container_width=True,
     height=400
 )
