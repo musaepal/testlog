@@ -41,10 +41,10 @@ with st.sidebar:
     col1, col2 = st.columns(2)
     with col1:
         start_date = st.date_input('Start Date', min_time.date())
-        start_time = st.time_input('Start Time', min_time.time())
+        start_time = st.time_input('Start Time', min_time.time(), step=300)  # 5 minutes = 300 seconds
     with col2:
         end_date = st.date_input('End Date', max_time.date())
-        end_time = st.time_input('End Time', max_time.time())
+        end_time = st.time_input('End Time', max_time.time(), step=300)  # 5 minutes = 300 seconds
 
     start_datetime = datetime.combine(start_date, start_time)
     end_datetime = datetime.combine(end_date, end_time)
