@@ -92,19 +92,23 @@ st.header('📊 Summary Statistics')
 
 col1, col2, col3, col4 = st.columns(4)
 
-# Calculate requests per hour
+# Calculate requests per hour and per minute
 hourly_counts = df_filtered.groupby('hour').size()
+
+# Calculate requests per minute
+df_filtered['minute'] = df_filtered['timestamp'].dt.floor('min')
+minute_counts = df_filtered.groupby('minute').size()
 
 with col1:
     st.metric('총 요청 수', f'{len(df_filtered):,}')
 
 with col2:
-    avg_per_hour = hourly_counts.mean()
-    st.metric('평균 시간당 요청', f'{avg_per_hour:.0f}')
+    avg_per_minute = minute_counts.mean()
+    st.metric('평균 분당 요청', f'{avg_per_minute:.1f}')
 
 with col3:
-    max_per_hour = hourly_counts.max()
-    st.metric('최대 시간당 요청', f'{max_per_hour:.0f}')
+    max_per_minute = minute_counts.max()
+    st.metric('최대 분당 요청', f'{max_per_minute:.0f}')
 
 with col4:
     if len(hourly_counts) > 0:
@@ -345,11 +349,11 @@ with col1:
 with col2:
     # Export aggregated statistics
     summary_stats = {
-        'Metric': ['Total Requests', 'Avg Requests/Hour', 'Max Requests/Hour', 'Unique Paths'],
+        'Metric': ['Total Requests', 'Avg Requests/Minute', 'Max Requests/Minute', 'Unique Paths'],
         'Value': [
             len(df_filtered),
-            hourly_counts.mean() if len(hourly_counts) > 0 else 0,
-            hourly_counts.max() if len(hourly_counts) > 0 else 0,
+            minute_counts.mean() if len(minute_counts) > 0 else 0,
+            minute_counts.max() if len(minute_counts) > 0 else 0,
             df_filtered['path'].nunique() if 'path' in df_filtered.columns else 0
         ]
     }
