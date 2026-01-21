@@ -320,3 +320,72 @@ st.dataframe(
     use_container_width=True,
     height=400
 )
+
+# Export report section
+st.markdown('---')
+st.header('📥 Export Report')
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    # Export time-series data
+    export_time_counts = time_counts.copy()
+    if 'time_bucket' in export_time_counts.columns:
+        export_time_counts['time_bucket'] = export_time_counts['time_bucket'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    csv_time = export_time_counts.to_csv(index=False)
+    st.download_button(
+        label='📈 Download Time Series',
+        data=csv_time,
+        file_name=f'request_count_timeseries_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+        mime='text/csv',
+    )
+    st.caption(f'{len(export_time_counts)} time periods')
+
+with col2:
+    # Export aggregated statistics
+    summary_stats = {
+        'Metric': ['Total Requests', 'Avg Requests/Hour', 'Max Requests/Hour', 'Unique Paths'],
+        'Value': [
+            len(df_filtered),
+            hourly_counts.mean() if len(hourly_counts) > 0 else 0,
+            hourly_counts.max() if len(hourly_counts) > 0 else 0,
+            df_filtered['path'].nunique() if 'path' in df_filtered.columns else 0
+        ]
+    }
+
+    if 'method' in df_filtered.columns:
+        summary_stats['Metric'].append('Unique Methods')
+        summary_stats['Value'].append(df_filtered['method'].nunique())
+
+    if 'status' in df_filtered.columns:
+        summary_stats['Metric'].append('Unique Status Codes')
+        summary_stats['Value'].append(df_filtered['status'].nunique())
+
+    summary_df = pd.DataFrame(summary_stats)
+    csv_summary = summary_df.to_csv(index=False)
+
+    st.download_button(
+        label='📊 Download Summary Stats',
+        data=csv_summary,
+        file_name=f'request_count_summary_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+        mime='text/csv',
+    )
+    st.caption(f'{len(summary_df)} summary metrics')
+
+with col3:
+    # Export top paths
+    if 'path' in df_filtered.columns:
+        top_paths_export = df_filtered['path'].value_counts().head(50).reset_index()
+        top_paths_export.columns = ['path', 'count']
+        csv_paths = top_paths_export.to_csv(index=False)
+
+        st.download_button(
+            label='🔝 Download Top Paths',
+            data=csv_paths,
+            file_name=f'top_paths_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+            mime='text/csv',
+        )
+        st.caption(f'Top 50 paths')
+
+st.info(f'💡 Export filtered data from {df_filtered["timestamp"].min().strftime("%Y-%m-%d %H:%M")} to {df_filtered["timestamp"].max().strftime("%Y-%m-%d %H:%M")}')

@@ -214,3 +214,57 @@ st.dataframe(
 )
 
 st.caption(f'Showing {min(100, len(display_df))} of {len(display_df)} filtered entries')
+
+# Export report section
+st.markdown('---')
+st.header('📥 Export Report')
+
+col1, col2 = st.columns(2)
+
+with col1:
+    # Prepare summary statistics for export
+    summary_data = []
+    for metric in ['rt', 'uct', 'uht', 'urt']:
+        if metric in df_filtered.columns:
+            values = df_filtered[metric].dropna()
+            if not values.empty:
+                summary_data.append({
+                    'Metric': metric,
+                    'Count': len(values),
+                    'Mean': values.mean(),
+                    'Min': values.min(),
+                    'Max': values.max(),
+                    'P50': values.quantile(0.50),
+                    'P95': values.quantile(0.95),
+                    'P99': values.quantile(0.99),
+                })
+
+    summary_df = pd.DataFrame(summary_data)
+
+    # Export summary statistics
+    if not summary_df.empty:
+        csv_summary = summary_df.to_csv(index=False)
+        st.download_button(
+            label='📊 Download Summary Statistics',
+            data=csv_summary,
+            file_name=f'response_time_summary_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+            mime='text/csv',
+        )
+
+with col2:
+    # Export detailed data
+    export_df = display_df[available_display_columns].copy()
+
+    # Convert timestamp to string for CSV export
+    if 'timestamp' in export_df.columns:
+        export_df['timestamp'] = export_df['timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    csv_detail = export_df.to_csv(index=False)
+    st.download_button(
+        label='📋 Download Detailed Data',
+        data=csv_detail,
+        file_name=f'response_time_detail_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+        mime='text/csv',
+    )
+
+st.info(f'💡 Summary: {len(summary_df)} metrics | Detail: {len(export_df)} entries')
