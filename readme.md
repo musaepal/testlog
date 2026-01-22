@@ -81,4 +81,5 @@ streamlit run app.py
 
 테스트용 샘플 로그 파일이 포함되어 있습니다:
 - `sample_access.log`: 기본 샘플 데이터 (20건)
-- `csap-prd-ins-obs-prx-01_access.log`: 실제 프로덕션 로그 샘플
+
+https://testlog-fpmzxm9hyqbmmb3gtcvpbb.streamlit.app/
