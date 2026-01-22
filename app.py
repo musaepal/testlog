@@ -3,6 +3,7 @@ Access Log Performance Metrics Dashboard - Home Page
 """
 
 import streamlit as st
+import os
 from utils import parse_access_log
 
 st.set_page_config(
@@ -37,6 +38,18 @@ with st.sidebar:
         placeholder='192.168.125.10 - - 180.210.85.207 [19/Jan/2026:10:57:33 +0900] ...',
         key='home_textarea'
     )
+
+    # Sample log test button
+    st.markdown('---')
+    st.subheader('🧪 Sample Data')
+    if st.button('📂 Load Sample Log', use_container_width=True, type='primary'):
+        sample_file_path = os.path.join(os.path.dirname(__file__), 'sample_access.log')
+        if os.path.exists(sample_file_path):
+            with open(sample_file_path, 'r', encoding='utf-8') as f:
+                sample_content = f.read()
+            df_sample = parse_access_log(sample_content)
+            st.session_state['log_data'] = df_sample
+            st.rerun()
 
 # Process and store log data in session state
 if uploaded_file is not None:
