@@ -98,7 +98,7 @@ st.markdown('---')
 st.header('📈 Performance Metrics Over Time')
 
 if selected_metrics:
-    fig = go.Figure()
+    from plotly.subplots import make_subplots
 
     colors = {
         'rt': '#1f77b4',   # blue
@@ -114,49 +114,58 @@ if selected_metrics:
         'urt': 'Upstream Response Time (urt)',
     }
 
-    # Order metrics for stacked display (smaller values at bottom)
-    metric_order = ['uct', 'uht', 'urt', 'rt']
-    ordered_metrics = [m for m in metric_order if m in selected_metrics]
+    # Filter to only metrics that exist in data
+    available_metrics = [m for m in selected_metrics if m in df_filtered.columns]
+    num_metrics = len(available_metrics)
 
-    for metric in ordered_metrics:
-        if metric in df_filtered.columns:
-            fig.add_trace(go.Scatter(
-                x=df_filtered['timestamp'],
-                y=df_filtered[metric],
-                mode='lines',
-                name=metric_labels.get(metric, metric),
-                line=dict(width=0.5, color=colors.get(metric, '#333')),
-                stackgroup='one',
-                fillcolor=colors.get(metric, '#333'),
-                hovertemplate=(
-                    f'<b>{metric_labels.get(metric, metric)}</b><br>'
-                    'Time: %{x}<br>'
-                    'Value: %{y:.3f}s<br>'
-                    '<extra></extra>'
-                )
-            ))
+    if num_metrics > 0:
+        # Create subplots - one row per metric
+        fig = make_subplots(
+            rows=num_metrics,
+            cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.05,
+            subplot_titles=[metric_labels.get(m, m) for m in available_metrics]
+        )
 
-    fig.update_layout(
-        title='Performance Metrics Timeline (Stacked)',
-        xaxis_title='Timestamp',
-        yaxis_title='Time (seconds)',
-        hovermode='x unified',
-        legend=dict(
-            orientation='h',
-            yanchor='bottom',
-            y=1.02,
-            xanchor='right',
-            x=1
-        ),
-        height=550,
-        xaxis=dict(
-            rangeslider=dict(visible=True, thickness=0.08),
-            type='date'
-        ),
-    )
+        for idx, metric in enumerate(available_metrics, 1):
+            fig.add_trace(
+                go.Scatter(
+                    x=df_filtered['timestamp'],
+                    y=df_filtered[metric],
+                    mode='lines',
+                    name=metric_labels.get(metric, metric),
+                    line=dict(width=1.5, color=colors.get(metric, '#333')),
+                    fill='tozeroy',
+                    fillcolor=f"rgba{tuple(list(int(colors.get(metric, '#333').lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) + [0.3])}",
+                    hovertemplate=(
+                        f'<b>{metric_labels.get(metric, metric)}</b><br>'
+                        'Time: %{x}<br>'
+                        'Value: %{y:.3f}s<br>'
+                        '<extra></extra>'
+                    )
+                ),
+                row=idx,
+                col=1
+            )
+            fig.update_yaxes(title_text='초 (s)', row=idx, col=1)
 
-    st.plotly_chart(fig, use_container_width=True, config={'scrollZoom': True})
-    st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
+        fig.update_layout(
+            title='Performance Metrics Timeline',
+            height=200 * num_metrics + 100,
+            showlegend=False,
+            hovermode='x unified',
+        )
+
+        # Add rangeslider to the bottom x-axis only
+        fig.update_xaxes(
+            rangeslider=dict(visible=True, thickness=0.05),
+            row=num_metrics,
+            col=1
+        )
+
+        st.plotly_chart(fig, use_container_width=True, config={'scrollZoom': True})
+        st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
 else:
     st.info('Select at least one metric from the sidebar')
 
