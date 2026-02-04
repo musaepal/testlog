@@ -145,10 +145,15 @@ fig_timeline.update_layout(
     xaxis_title='Time',
     yaxis_title='Request Count',
     hovermode='x unified',
-    height=500,
+    height=550,
+    xaxis=dict(
+        rangeslider=dict(visible=True, thickness=0.08),
+        type='date'
+    ),
 )
 
-st.plotly_chart(fig_timeline, use_container_width=True)
+st.plotly_chart(fig_timeline, use_container_width=True, config={'scrollZoom': True})
+st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
 
 # Two columns for additional charts
 col1, col2 = st.columns(2)

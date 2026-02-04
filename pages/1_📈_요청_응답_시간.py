@@ -148,10 +148,15 @@ if selected_metrics:
             xanchor='right',
             x=1
         ),
-        height=500,
+        height=550,
+        xaxis=dict(
+            rangeslider=dict(visible=True, thickness=0.08),
+            type='date'
+        ),
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, config={'scrollZoom': True})
+    st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
 else:
     st.info('Select at least one metric from the sidebar')
 
