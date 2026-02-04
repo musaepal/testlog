@@ -114,15 +114,20 @@ if selected_metrics:
         'urt': 'Upstream Response Time (urt)',
     }
 
-    for metric in selected_metrics:
+    # Order metrics for stacked display (smaller values at bottom)
+    metric_order = ['uct', 'uht', 'urt', 'rt']
+    ordered_metrics = [m for m in metric_order if m in selected_metrics]
+
+    for metric in ordered_metrics:
         if metric in df_filtered.columns:
             fig.add_trace(go.Scatter(
                 x=df_filtered['timestamp'],
                 y=df_filtered[metric],
-                mode='lines+markers',
+                mode='lines',
                 name=metric_labels.get(metric, metric),
-                line=dict(color=colors.get(metric, '#333')),
-                marker=dict(size=4),
+                line=dict(width=0.5, color=colors.get(metric, '#333')),
+                stackgroup='one',
+                fillcolor=colors.get(metric, '#333'),
                 hovertemplate=(
                     f'<b>{metric_labels.get(metric, metric)}</b><br>'
                     'Time: %{x}<br>'
@@ -132,7 +137,7 @@ if selected_metrics:
             ))
 
     fig.update_layout(
-        title='Performance Metrics Timeline',
+        title='Performance Metrics Timeline (Stacked)',
         xaxis_title='Timestamp',
         yaxis_title='Time (seconds)',
         hovermode='x unified',
