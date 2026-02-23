@@ -1,5 +1,5 @@
 """
-Shared utility functions for access log analysis
+Shared utility functions for access log and DNS monitor log analysis
 """
 
 import re
@@ -75,5 +75,88 @@ def parse_access_log(log_content: str) -> pd.DataFrame:
     df = pd.DataFrame(records)
     if not df.empty and 'timestamp' in df.columns:
         df = df.sort_values('timestamp').reset_index(drop=True)
+
+    return df
+
+
+def parse_dns_monitor_log(log_content: str) -> pd.DataFrame:
+    """Parse DNS monitor log and extract performance metrics.
+
+    Expected format (pairs of lines per domain per timestamp):
+    [2026-02-23 09:00:12] [INFO] [domain.com] (성공수/실패수/전체조회수)
+    [2026-02-23 09:00:12] [INFO] [domain.com] 응답시간 통계 - 최소 : 0ms, 평균 : 10ms, 최대 15ms, P95:11ms, P99: 13ms
+    """
+
+    # Pattern for count line: (성공/실패/전체)
+    count_pattern = re.compile(
+        r'\[(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\]\s+'
+        r'\[INFO\]\s+'
+        r'\[([^\]]+)\]\s+'
+        r'\((\d+)/(\d+)/(\d+)\)'
+    )
+
+    # Pattern for response time stats line
+    stats_pattern = re.compile(
+        r'\[(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\]\s+'
+        r'\[INFO\]\s+'
+        r'\[([^\]]+)\]\s+'
+        r'응답시간\s+통계\s*-\s*'
+        r'최소\s*:\s*(\d+)\s*ms\s*,\s*'
+        r'평균\s*:\s*(\d+)\s*ms\s*,\s*'
+        r'최대\s*(\d+)\s*ms\s*,\s*'
+        r'P95\s*:\s*(\d+)\s*ms\s*,\s*'
+        r'P99\s*:\s*(\d+)\s*ms'
+    )
+
+    # First pass: collect count data keyed by (timestamp, domain)
+    count_data = {}
+    for line in log_content.strip().split('\n'):
+        match = count_pattern.match(line.strip())
+        if match:
+            ts_str, domain, success, fail, total = match.groups()
+            count_data[(ts_str, domain)] = {
+                'success': int(success),
+                'fail': int(fail),
+                'total': int(total),
+            }
+
+    # Second pass: collect stats and merge with counts
+    records = []
+    for line in log_content.strip().split('\n'):
+        match = stats_pattern.match(line.strip())
+        if match:
+            ts_str, domain, min_ms, avg_ms, max_ms, p95_ms, p99_ms = match.groups()
+
+            try:
+                dt = datetime.strptime(ts_str, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                dt = None
+
+            record = {
+                'timestamp': dt,
+                'domain': domain,
+                'min_ms': int(min_ms),
+                'avg_ms': int(avg_ms),
+                'max_ms': int(max_ms),
+                'p95_ms': int(p95_ms),
+                'p99_ms': int(p99_ms),
+            }
+
+            # Merge count data if available
+            key = (ts_str, domain)
+            if key in count_data:
+                record.update(count_data[key])
+            else:
+                record['success'] = 0
+                record['fail'] = 0
+                record['total'] = 0
+
+            records.append(record)
+
+    df = pd.DataFrame(records)
+    if not df.empty and 'timestamp' in df.columns:
+        df = df.sort_values(['timestamp', 'domain']).reset_index(drop=True)
+        if 'total' in df.columns:
+            df['fail_rate'] = (df['fail'] / df['total'] * 100).round(2)
 
     return df
