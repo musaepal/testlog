@@ -80,14 +80,21 @@ class ReportPDF(FPDF):
             self.ln()
         self.ln(3)
 
+    def check_space(self, needed=120):
+        """Add new page if remaining space is less than needed (mm)."""
+        remaining = 297 - self.get_y() - 20  # A4 height - current y - footer margin
+        if remaining < needed:
+            self.add_page()
+
     def add_chart_image(self, fig, width=180):
         """Add a Plotly chart as image to the PDF."""
+        self.check_space(needed=110)
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
             tmp_path = tmp.name
         try:
-            fig.write_image(tmp_path, width=1200, height=500, scale=2)
+            fig.write_image(tmp_path, width=1200, height=400, scale=2)
             self.image(tmp_path, x=15, w=width)
-            self.ln(5)
+            self.ln(3)
         except Exception:
             self.set_font('Helvetica', 'I', 9)
             self.set_text_color(128, 128, 128)
@@ -162,17 +169,14 @@ def generate_dns_report(df_filtered, domains, figures, compare_df):
         pdf.add_chart_image(figures['response_time'])
 
     if 'max_response' in figures:
-        pdf.add_page()
         pdf.section_title('4. Max Response Time Timeline')
         pdf.add_chart_image(figures['max_response'])
 
     if 'fail_rate' in figures:
-        pdf.add_page()
         pdf.section_title('5. Fail Rate Timeline')
         pdf.add_chart_image(figures['fail_rate'])
 
     if 'compare_resp' in figures:
-        pdf.add_page()
         pdf.section_title('6. Domain Comparison - Response Time')
         pdf.add_chart_image(figures['compare_resp'])
 
@@ -229,14 +233,11 @@ def generate_web_response_report(df_filtered, summary_df, figures):
 
     # 3. Charts
     if 'timeline' in figures:
-        pdf.add_page()
         pdf.section_title('3. Performance Metrics Timeline')
         pdf.add_chart_image(figures['timeline'])
 
     if 'distributions' in figures:
         for i, fig in enumerate(figures['distributions']):
-            if i % 2 == 0:
-                pdf.add_page()
             pdf.section_title(f'4-{i+1}. Distribution')
             pdf.add_chart_image(fig)
 
@@ -280,12 +281,10 @@ def generate_web_request_report(df_filtered, time_counts, summary_stats_df, figu
 
     # 3. Charts
     if 'timeline' in figures:
-        pdf.add_page()
         pdf.section_title('3. Requests Over Time')
         pdf.add_chart_image(figures['timeline'])
 
     if 'method' in figures:
-        pdf.add_page()
         pdf.section_title('4. HTTP Method Distribution')
         pdf.add_chart_image(figures['method'])
 
@@ -294,7 +293,6 @@ def generate_web_request_report(df_filtered, time_counts, summary_stats_df, figu
         pdf.add_chart_image(figures['status'])
 
     if 'pattern' in figures:
-        pdf.add_page()
         pdf.section_title('6. Traffic Pattern by Hour')
         pdf.add_chart_image(figures['pattern'])
 
