@@ -8,6 +8,16 @@ import os
 from datetime import datetime
 from fpdf import FPDF
 
+# Configure kaleido for Streamlit Cloud compatibility
+try:
+    import plotly.io as pio
+    pio.kaleido.scope.chromium_args = tuple([
+        arg for arg in pio.kaleido.scope.chromium_args
+        if arg != "--disable-dev-shm-usage"
+    ] + ["--no-sandbox"])
+except Exception:
+    pass
+
 
 class ReportPDF(FPDF):
     """Custom PDF class with header/footer for reports."""
