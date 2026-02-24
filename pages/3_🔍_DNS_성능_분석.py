@@ -190,6 +190,49 @@ if num_domains > 0:
 
 st.markdown('---')
 
+# Max response time chart
+st.header('🔺 도메인별 최대 응답시간 추이')
+
+fig_max = go.Figure()
+
+for idx, domain in enumerate(domains):
+    domain_df = df_filtered[df_filtered['domain'] == domain].sort_values('timestamp')
+    color = colors_map[idx % len(colors_map)]
+
+    fig_max.add_trace(
+        go.Scatter(
+            x=domain_df['timestamp'],
+            y=domain_df['max_ms'],
+            mode='lines+markers',
+            name=domain,
+            line=dict(width=2, color=color),
+            marker=dict(size=5),
+            hovertemplate=(
+                f'<b>{domain}</b><br>'
+                'Time: %{x}<br>'
+                'Max: %{y}ms<br>'
+                '<extra></extra>'
+            )
+        )
+    )
+
+fig_max.update_layout(
+    xaxis_title='Time',
+    yaxis_title='Max Response Time (ms)',
+    hovermode='x unified',
+    height=450,
+    legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+    xaxis=dict(
+        rangeslider=dict(visible=True, thickness=0.08),
+        type='date'
+    ),
+)
+
+st.plotly_chart(fig_max, use_container_width=True, config={'scrollZoom': True})
+st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
+
+st.markdown('---')
+
 # Success/Fail counts
 st.header('📊 도메인별 조회수 (성공/실패)')
 
