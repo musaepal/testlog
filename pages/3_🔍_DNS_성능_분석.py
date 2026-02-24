@@ -407,7 +407,7 @@ st.dataframe(
 st.markdown('---')
 st.header('📥 Export Report')
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     csv_summary = compare_df.to_csv(index=False)
@@ -428,6 +428,44 @@ with col2:
         data=csv_detail,
         file_name=f'dns_detail_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
         mime='text/csv',
+    )
+
+with col3:
+    from pdf_report import generate_dns_report
+
+    # Build figures for PDF (without rangeslider for cleaner export)
+    pdf_fig_resp = make_subplots(rows=num_domains, cols=1, shared_xaxes=True,
+                                 vertical_spacing=0.08, subplot_titles=[d for d in domains])
+    for idx, domain in enumerate(domains, 1):
+        domain_df = df_filtered[df_filtered['domain'] == domain].sort_values('timestamp')
+        color = colors_map[(idx - 1) % len(colors_map)]
+        pdf_fig_resp.add_trace(go.Scatter(x=domain_df['timestamp'], y=domain_df['avg_ms'],
+                                          mode='lines+markers', name=f'{domain} (avg)',
+                                          line=dict(width=2, color=color), marker=dict(size=4)), row=idx, col=1)
+        pdf_fig_resp.add_trace(go.Scatter(x=domain_df['timestamp'], y=domain_df['p95_ms'],
+                                          mode='lines', name=f'{domain} (P95)',
+                                          line=dict(width=1, dash='dash', color=color), opacity=0.7), row=idx, col=1)
+        pdf_fig_resp.add_trace(go.Scatter(x=domain_df['timestamp'], y=domain_df['p99_ms'],
+                                          mode='lines', name=f'{domain} (P99)',
+                                          line=dict(width=1, dash='dot', color='#d62728'), opacity=0.5), row=idx, col=1)
+        pdf_fig_resp.update_yaxes(title_text='ms', row=idx, col=1)
+    pdf_fig_resp.update_layout(height=250 * num_domains + 100, showlegend=True, hovermode='x unified',
+                                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1))
+
+    pdf_figures = {
+        'response_time': pdf_fig_resp,
+        'max_response': fig_max,
+        'fail_rate': fig_fail,
+        'compare_resp': fig_compare_resp,
+        'compare_count': fig_compare_count,
+    }
+
+    pdf_bytes = generate_dns_report(df_filtered, domains, pdf_figures, compare_df)
+    st.download_button(
+        label='📄 Download PDF Report',
+        data=pdf_bytes,
+        file_name=f'dns_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
+        mime='application/pdf',
     )
 
 st.info(f'💡 {len(domains)} domains | {len(df_filtered)} records | '

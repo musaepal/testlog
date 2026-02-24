@@ -238,28 +238,28 @@ st.caption(f'Showing {min(100, len(display_df))} of {len(display_df)} filtered e
 st.markdown('---')
 st.header('📥 Export Report')
 
-col1, col2 = st.columns(2)
+# Prepare summary statistics for export
+summary_data = []
+for metric in ['rt', 'uct', 'uht', 'urt']:
+    if metric in df_filtered.columns:
+        values = df_filtered[metric].dropna()
+        if not values.empty:
+            summary_data.append({
+                'Metric': metric,
+                'Count': len(values),
+                'Mean': values.mean(),
+                'Min': values.min(),
+                'Max': values.max(),
+                'P50': values.quantile(0.50),
+                'P95': values.quantile(0.95),
+                'P99': values.quantile(0.99),
+            })
+
+summary_df = pd.DataFrame(summary_data)
+
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    # Prepare summary statistics for export
-    summary_data = []
-    for metric in ['rt', 'uct', 'uht', 'urt']:
-        if metric in df_filtered.columns:
-            values = df_filtered[metric].dropna()
-            if not values.empty:
-                summary_data.append({
-                    'Metric': metric,
-                    'Count': len(values),
-                    'Mean': values.mean(),
-                    'Min': values.min(),
-                    'Max': values.max(),
-                    'P50': values.quantile(0.50),
-                    'P95': values.quantile(0.95),
-                    'P99': values.quantile(0.99),
-                })
-
-    summary_df = pd.DataFrame(summary_data)
-
     # Export summary statistics
     if not summary_df.empty:
         csv_summary = summary_df.to_csv(index=False)
@@ -284,6 +284,49 @@ with col2:
         data=csv_detail,
         file_name=f'response_time_detail_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
         mime='text/csv',
+    )
+
+with col3:
+    from pdf_report import generate_web_response_report
+
+    # Build figures for PDF
+    pdf_figures = {}
+    if selected_metrics:
+        available_metrics = [m for m in selected_metrics if m in df_filtered.columns]
+        num_metrics = len(available_metrics)
+        if num_metrics > 0:
+            from plotly.subplots import make_subplots as mk_sub
+            pdf_fig = mk_sub(rows=num_metrics, cols=1, shared_xaxes=True,
+                             vertical_spacing=0.05,
+                             subplot_titles=[{'rt': 'Response Time (rt)', 'uct': 'Upstream Connect Time (uct)',
+                                              'uht': 'Upstream Header Time (uht)', 'urt': 'Upstream Response Time (urt)'}.get(m, m)
+                                             for m in available_metrics])
+            colors_map = {'rt': '#1f77b4', 'uct': '#ff7f0e', 'uht': '#2ca02c', 'urt': '#d62728'}
+            for i, m in enumerate(available_metrics, 1):
+                pdf_fig.add_trace(go.Scatter(x=df_filtered['timestamp'], y=df_filtered[m], mode='lines',
+                                             name=m, line=dict(width=1.5, color=colors_map.get(m, '#333')),
+                                             fill='tozeroy'), row=i, col=1)
+                pdf_fig.update_yaxes(title_text='s', row=i, col=1)
+            pdf_fig.update_layout(height=200 * num_metrics + 100, showlegend=False, hovermode='x unified')
+            pdf_figures['timeline'] = pdf_fig
+
+    # Distribution figures
+    dist_figs = []
+    for metric in selected_metrics[:4]:
+        if metric in df_filtered.columns:
+            fig_d = px.histogram(df_filtered, x=metric, nbins=50,
+                                  title=f'{metric} Distribution', labels={metric: 'Time (seconds)'})
+            fig_d.update_layout(xaxis_title='Time (seconds)', yaxis_title='Count', height=400)
+            dist_figs.append(fig_d)
+    if dist_figs:
+        pdf_figures['distributions'] = dist_figs
+
+    pdf_bytes = generate_web_response_report(df_filtered, summary_df, pdf_figures)
+    st.download_button(
+        label='📄 Download PDF Report',
+        data=pdf_bytes,
+        file_name=f'response_time_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
+        mime='application/pdf',
     )
 
 st.info(f'💡 Summary: {len(summary_df)} metrics | Detail: {len(export_df)} entries')

@@ -334,7 +334,28 @@ st.dataframe(
 st.markdown('---')
 st.header('📥 Export Report')
 
-col1, col2, col3 = st.columns(3)
+# Export aggregated statistics
+summary_stats = {
+    'Metric': ['Total Requests', 'Avg Requests/Minute', 'Max Requests/Minute', 'Unique Paths'],
+    'Value': [
+        len(df_filtered),
+        minute_counts.mean() if len(minute_counts) > 0 else 0,
+        minute_counts.max() if len(minute_counts) > 0 else 0,
+        df_filtered['path'].nunique() if 'path' in df_filtered.columns else 0
+    ]
+}
+
+if 'method' in df_filtered.columns:
+    summary_stats['Metric'].append('Unique Methods')
+    summary_stats['Value'].append(df_filtered['method'].nunique())
+
+if 'status' in df_filtered.columns:
+    summary_stats['Metric'].append('Unique Status Codes')
+    summary_stats['Value'].append(df_filtered['status'].nunique())
+
+summary_df = pd.DataFrame(summary_stats)
+
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     # Export time-series data
@@ -349,38 +370,15 @@ with col1:
         file_name=f'request_count_timeseries_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
         mime='text/csv',
     )
-    st.caption(f'{len(export_time_counts)} time periods')
 
 with col2:
-    # Export aggregated statistics
-    summary_stats = {
-        'Metric': ['Total Requests', 'Avg Requests/Minute', 'Max Requests/Minute', 'Unique Paths'],
-        'Value': [
-            len(df_filtered),
-            minute_counts.mean() if len(minute_counts) > 0 else 0,
-            minute_counts.max() if len(minute_counts) > 0 else 0,
-            df_filtered['path'].nunique() if 'path' in df_filtered.columns else 0
-        ]
-    }
-
-    if 'method' in df_filtered.columns:
-        summary_stats['Metric'].append('Unique Methods')
-        summary_stats['Value'].append(df_filtered['method'].nunique())
-
-    if 'status' in df_filtered.columns:
-        summary_stats['Metric'].append('Unique Status Codes')
-        summary_stats['Value'].append(df_filtered['status'].nunique())
-
-    summary_df = pd.DataFrame(summary_stats)
     csv_summary = summary_df.to_csv(index=False)
-
     st.download_button(
         label='📊 Download Summary Stats',
         data=csv_summary,
         file_name=f'request_count_summary_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
         mime='text/csv',
     )
-    st.caption(f'{len(summary_df)} summary metrics')
 
 with col3:
     # Export top paths
@@ -395,6 +393,25 @@ with col3:
             file_name=f'top_paths_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
             mime='text/csv',
         )
-        st.caption(f'Top 50 paths')
+
+with col4:
+    from pdf_report import generate_web_request_report
+
+    pdf_figures = {
+        'timeline': fig_timeline,
+        'pattern': fig_pattern,
+    }
+    if 'method' in df_filtered.columns:
+        pdf_figures['method'] = fig_method
+    if 'status' in df_filtered.columns:
+        pdf_figures['status'] = fig_status
+
+    pdf_bytes = generate_web_request_report(df_filtered, time_counts, summary_df, pdf_figures)
+    st.download_button(
+        label='📄 Download PDF Report',
+        data=pdf_bytes,
+        file_name=f'request_count_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
+        mime='application/pdf',
+    )
 
 st.info(f'💡 Export filtered data from {df_filtered["timestamp"].min().strftime("%Y-%m-%d %H:%M")} to {df_filtered["timestamp"].max().strftime("%Y-%m-%d %H:%M")}')
