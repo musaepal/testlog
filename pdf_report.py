@@ -84,14 +84,6 @@ class ReportPDF(FPDF):
             self.cell(0, 8, '(Chart image not available in this environment)', new_x='LMARGIN', new_y='NEXT')
             self.set_text_color(0, 0, 0)
             self.ln(3)
-
-            # Add chart data as table if available
-            if hasattr(fig, 'data') and fig.data:
-                for trace in fig.data[:3]:
-                    if hasattr(trace, 'name') and trace.name:
-                        self.set_font('Helvetica', '', 8)
-                        self.cell(0, 5, f'  - {trace.name}', new_x='LMARGIN', new_y='NEXT')
-                self.ln(2)
         finally:
             if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
