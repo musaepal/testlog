@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 st.title('📊 Log Performance Metrics Dashboard')
-st.markdown('Nginx 액세스 로그 및 DNS 모니터 로그를 분석하여 성능 지표를 시각화합니다.')
+st.markdown('Analyzes Nginx access logs and DNS monitor logs to visualize performance metrics.')
 
 st.markdown('---')
 
@@ -75,7 +75,7 @@ if uploaded_file is not None:
     if log_type == 'DNS Monitor Log':
         df = parse_dns_monitor_log(content)
         if df.empty:
-            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 DNS 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+            st.sidebar.error(f'❌ Parse error: Failed to parse DNS log from {total_lines} lines. Please check the log format.')
         else:
             st.session_state['dns_data'] = df
             st.session_state['active_log_type'] = 'dns'
@@ -83,7 +83,7 @@ if uploaded_file is not None:
     else:
         df = parse_access_log(content)
         if df.empty:
-            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 Web Access 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+            st.sidebar.error(f'❌ Parse error: Failed to parse Web Access log from {total_lines} lines. Please check the log format.')
         else:
             st.session_state['log_data'] = df
             st.session_state['active_log_type'] = 'web'
@@ -93,7 +93,7 @@ elif log_text.strip():
     if log_type == 'DNS Monitor Log':
         df = parse_dns_monitor_log(log_text)
         if df.empty:
-            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 DNS 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+            st.sidebar.error(f'❌ Parse error: Failed to parse DNS log from {total_lines} lines. Please check the log format.')
         else:
             st.session_state['dns_data'] = df
             st.session_state['active_log_type'] = 'dns'
@@ -101,7 +101,7 @@ elif log_text.strip():
     else:
         df = parse_access_log(log_text)
         if df.empty:
-            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 Web Access 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+            st.sidebar.error(f'❌ Parse error: Failed to parse Web Access log from {total_lines} lines. Please check the log format.')
         else:
             st.session_state['log_data'] = df
             st.session_state['active_log_type'] = 'web'
@@ -114,126 +114,126 @@ active_type = st.session_state.get('active_log_type', None)
 
 # Display home page content
 if not has_web and not has_dns:
-    st.info('👆 왼쪽 사이드바에서 로그 파일을 업로드하거나 Sample Data 버튼을 클릭하세요.')
+    st.info('👆 Upload a log file from the sidebar or click a Sample Data button.')
 
     # Show example formats
-    with st.expander('📋 Web Access Log 형식'):
+    with st.expander('📋 Web Access Log Format'):
         st.code('''192.168.125.10 - - 180.210.85.207 [19/Jan/2026:10:57:33 +0900] "PUT /path/file.png HTTP/1.1" 200 25 "-" "user-agent" "-" rt=0.541 uct=0.008 uht=0.541 urt=0.541 ua="192.168.125.69:443" us="200"''')
         st.markdown('''
-        **성능 지표 설명:**
-        - **rt**: 전체 응답 시간 (Response Time)
-        - **uct**: 업스트림 연결 시간 (Upstream Connect Time)
-        - **uht**: 업스트림 헤더 수신 시간 (Upstream Header Time)
-        - **urt**: 업스트림 응답 시간 (Upstream Response Time)
+        **Performance Metrics:**
+        - **rt**: Response Time
+        - **uct**: Upstream Connect Time
+        - **uht**: Upstream Header Time
+        - **urt**: Upstream Response Time
         ''')
 
-    with st.expander('📋 DNS Monitor Log 형식'):
+    with st.expander('📋 DNS Monitor Log Format'):
         st.code('''[2026-02-23 09:00:12] [INFO] [domain.com] (1523/12/1535)
 [2026-02-23 09:00:12] [INFO] [domain.com] 응답시간 통계 - 최소 : 0ms, 평균 : 10ms, 최대 15ms, P95:11ms, P99: 13ms''')
         st.markdown('''
-        **DNS 지표 설명:**
-        - **성공수/실패수/전체조회수**: DNS 조회 결과
-        - **응답시간 통계**: 최소, 평균, 최대, P95, P99 (ms)
+        **DNS Metrics:**
+        - **success/fail/total**: DNS query results
+        - **Response time stats**: min, avg, max, P95, P99 (ms)
         ''')
 
     st.markdown('---')
 
-    st.subheader('📑 사용 가능한 분석 페이지')
+    st.subheader('📑 Available Analysis Pages')
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown('''
-        ### 📈 요청 응답 시간 분석
-        - 시간대별 응답 시간 추이
-        - rt, uct, uht, urt 메트릭 시각화
-        - 통계 요약 (평균, 최소, 최대, P95)
-        - 분포 히스토그램
+        ### 📈 Response Time Analysis
+        - Response time trends over time
+        - rt, uct, uht, urt metrics visualization
+        - Summary statistics (avg, min, max, P95)
+        - Distribution histograms
         ''')
 
     with col2:
         st.markdown('''
-        ### 📊 시간당 요청수 분석
-        - 시간대별 요청 건수 추이
-        - HTTP 메서드별 분포
-        - 상태 코드별 분포
-        - 피크 시간대 분석
+        ### 📊 Request Count Analysis
+        - Request count trends over time
+        - HTTP method distribution
+        - Status code distribution
+        - Peak time analysis
         ''')
 
     with col3:
         st.markdown('''
-        ### 🔍 DNS 성능 분석
-        - 도메인별 응답시간 추이
-        - 성공/실패 조회수 분석
-        - P95/P99 응답시간 비교
-        - 실패율 모니터링
+        ### 🔍 DNS Performance Analysis
+        - Response time trends by domain
+        - Success/fail query analysis
+        - P95/P99 response time comparison
+        - Fail rate monitoring
         ''')
 
 else:
     # Show Web Access Log summary
     if has_web and (active_type == 'web' or not has_dns):
-        st.subheader('🌐 Web Access Log 데이터')
+        st.subheader('🌐 Web Access Log Data')
         df = st.session_state['log_data']
 
-        st.success(f'✅ {len(df)} 건의 웹 액세스 로그가 로드되었습니다.')
+        st.success(f'✅ {len(df)} web access log entries loaded.')
 
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            st.metric('총 요청 수', f'{len(df):,}')
+            st.metric('Total Requests', f'{len(df):,}')
         with col2:
             if 'timestamp' in df.columns and df['timestamp'].notna().any():
                 time_range = df['timestamp'].max() - df['timestamp'].min()
                 hours = time_range.total_seconds() / 3600
-                st.metric('분석 기간', f'{hours:.1f} 시간')
+                st.metric('Analysis Period', f'{hours:.1f} hours')
             else:
-                st.metric('분석 기간', 'N/A')
+                st.metric('Analysis Period', 'N/A')
         with col3:
             if 'status' in df.columns:
                 success_rate = (df['status'] == 200).sum() / len(df) * 100
-                st.metric('성공률 (200)', f'{success_rate:.1f}%')
+                st.metric('Success Rate (200)', f'{success_rate:.1f}%')
             else:
-                st.metric('성공률', 'N/A')
+                st.metric('Success Rate', 'N/A')
         with col4:
             if 'rt' in df.columns:
                 avg_rt = df['rt'].mean()
-                st.metric('평균 응답시간', f'{avg_rt:.3f}s')
+                st.metric('Avg Response Time', f'{avg_rt:.3f}s')
             else:
-                st.metric('평균 응답시간', 'N/A')
+                st.metric('Avg Response Time', 'N/A')
 
         st.markdown('---')
-        st.info('👈 왼쪽 사이드바에서 📈 요청 응답 시간 또는 📊 시간당 요청수 페이지를 선택하세요.')
+        st.info('👈 Select Response Time or Request Count page from the sidebar.')
 
-        st.subheader('📋 데이터 미리보기 (최근 10건)')
+        st.subheader('📋 Data Preview (Last 10)')
         display_columns = ['timestamp', 'method', 'path', 'status', 'bytes', 'rt', 'uct', 'uht', 'urt']
         available_columns = [col for col in display_columns if col in df.columns]
         st.dataframe(df[available_columns].head(10), use_container_width=True, height=400)
 
     # Show DNS Monitor Log summary
     if has_dns and (active_type == 'dns' or not has_web):
-        st.subheader('🔍 DNS Monitor Log 데이터')
+        st.subheader('🔍 DNS Monitor Log Data')
         df_dns = st.session_state['dns_data']
 
-        st.success(f'✅ {len(df_dns)} 건의 DNS 모니터 로그가 로드되었습니다.')
+        st.success(f'✅ {len(df_dns)} DNS monitor log entries loaded.')
 
         domains = df_dns['domain'].unique()
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            st.metric('총 레코드 수', f'{len(df_dns):,}')
+            st.metric('Total Records', f'{len(df_dns):,}')
         with col2:
-            st.metric('도메인 수', f'{len(domains)}')
+            st.metric('Domains', f'{len(domains)}')
         with col3:
             avg_fail_rate = df_dns['fail_rate'].mean() if 'fail_rate' in df_dns.columns else 0
-            st.metric('평균 실패율', f'{avg_fail_rate:.2f}%')
+            st.metric('Avg Fail Rate', f'{avg_fail_rate:.2f}%')
         with col4:
             avg_resp = df_dns['avg_ms'].mean() if 'avg_ms' in df_dns.columns else 0
-            st.metric('평균 응답시간', f'{avg_resp:.1f}ms')
+            st.metric('Avg Response Time', f'{avg_resp:.1f}ms')
 
         st.markdown('---')
-        st.info('👈 왼쪽 사이드바에서 🔍 DNS 성능 분석 페이지를 선택하세요.')
+        st.info('👈 Select DNS Performance Analysis page from the sidebar.')
 
-        st.subheader('📋 데이터 미리보기 (최근 10건)')
+        st.subheader('📋 Data Preview (Last 10)')
         display_cols = ['timestamp', 'domain', 'success', 'fail', 'total', 'fail_rate', 'avg_ms', 'p95_ms', 'p99_ms']
         available_cols = [col for col in display_cols if col in df_dns.columns]
         st.dataframe(df_dns[available_cols].head(10), use_container_width=True, height=400)

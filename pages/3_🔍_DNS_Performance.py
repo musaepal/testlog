@@ -10,17 +10,17 @@ from plotly.subplots import make_subplots
 from datetime import datetime
 
 st.set_page_config(
-    page_title='DNS 성능 분석',
+    page_title='DNS Performance Analysis',
     page_icon='🔍',
     layout='wide'
 )
 
-st.title('🔍 DNS 성능 분석')
-st.markdown('DNS 모니터 로그를 분석하여 도메인별 성능 지표를 시각화합니다.')
+st.title('🔍 DNS Performance Analysis')
+st.markdown('Analyze DNS monitor logs to visualize per-domain performance metrics.')
 
 # Check if data exists
 if 'dns_data' not in st.session_state or st.session_state['dns_data'].empty:
-    st.warning('⚠️ DNS 데이터가 로드되지 않았습니다. 홈페이지에서 DNS Monitor Log를 업로드해주세요.')
+    st.warning('⚠️ No DNS data loaded. Please upload a DNS Monitor Log from the home page.')
     st.stop()
 
 df = st.session_state['dns_data'].copy()
@@ -32,7 +32,7 @@ with st.sidebar:
     # Domain filter
     all_domains = sorted(df['domain'].unique())
     selected_domains = st.multiselect(
-        'Domain 선택',
+        'Select Domains',
         options=all_domains,
         default=all_domains,
         key='dns_domain_filter'
@@ -67,7 +67,7 @@ else:
     df_filtered = df.copy()
 
 if df_filtered.empty:
-    st.warning('선택한 필터에 해당하는 데이터가 없습니다.')
+    st.warning('No data matches the selected filters.')
     st.stop()
 
 st.sidebar.info(f'Showing {len(df_filtered)} of {len(st.session_state["dns_data"])} entries')
@@ -84,19 +84,19 @@ for idx, domain in enumerate(domains):
     domain_df = df_filtered[df_filtered['domain'] == domain]
     with cols[idx]:
         st.markdown(f'**{domain}**')
-        st.metric('평균 응답시간', f'{domain_df["avg_ms"].mean():.1f}ms')
-        st.metric('평균 P95', f'{domain_df["p95_ms"].mean():.1f}ms')
+        st.metric('Avg Response Time', f'{domain_df["avg_ms"].mean():.1f}ms')
+        st.metric('Avg P95', f'{domain_df["p95_ms"].mean():.1f}ms')
         total_success = domain_df['success'].sum()
         total_fail = domain_df['fail'].sum()
         total_all = domain_df['total'].sum()
         fail_rate = (total_fail / total_all * 100) if total_all > 0 else 0
-        st.metric('실패율', f'{fail_rate:.2f}%')
-        st.metric('총 조회수', f'{total_all:,}')
+        st.metric('Fail Rate', f'{fail_rate:.2f}%')
+        st.metric('Total Queries', f'{total_all:,}')
 
 st.markdown('---')
 
 # Response time timeline - subplots per domain
-st.header('📈 도메인별 응답시간 추이')
+st.header('📈 Response Time by Domain')
 
 num_domains = len(domains)
 if num_domains > 0:
@@ -186,12 +186,12 @@ if num_domains > 0:
     )
 
     st.plotly_chart(fig_resp, use_container_width=True, config={'scrollZoom': True})
-    st.caption('💡 실선: 평균 | 점선: P95 | 점점선: P99 | 마우스 드래그로 확대 | 더블클릭으로 초기화')
+    st.caption('💡 Solid: Avg | Dashed: P95 | Dotted: P99 | Drag to zoom | Double-click to reset')
 
 st.markdown('---')
 
 # Max response time chart
-st.header('🔺 도메인별 최대 응답시간 추이')
+st.header('🔺 Max Response Time by Domain')
 
 fig_max = go.Figure()
 
@@ -229,12 +229,12 @@ fig_max.update_layout(
 )
 
 st.plotly_chart(fig_max, use_container_width=True, config={'scrollZoom': True})
-st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
+st.caption('💡 Drag to zoom | Use slider to adjust range | Double-click to reset')
 
 st.markdown('---')
 
 # Success/Fail counts
-st.header('📊 도메인별 조회수 (성공/실패)')
+st.header('📊 Query Count by Domain (Success/Fail)')
 
 fig_counts = make_subplots(
     rows=num_domains,
@@ -251,11 +251,11 @@ for idx, domain in enumerate(domains, 1):
         go.Bar(
             x=domain_df['timestamp'],
             y=domain_df['success'],
-            name=f'{domain} (성공)',
+            name=f'{domain} (Success)',
             marker_color='#2ca02c',
             opacity=0.8,
             hovertemplate=(
-                f'<b>{domain} 성공</b><br>'
+                f'<b>{domain} Success</b><br>'
                 'Time: %{x}<br>'
                 'Count: %{y}<br>'
                 '<extra></extra>'
@@ -268,11 +268,11 @@ for idx, domain in enumerate(domains, 1):
         go.Bar(
             x=domain_df['timestamp'],
             y=domain_df['fail'],
-            name=f'{domain} (실패)',
+            name=f'{domain} (Fail)',
             marker_color='#d62728',
             opacity=0.8,
             hovertemplate=(
-                f'<b>{domain} 실패</b><br>'
+                f'<b>{domain} Fail</b><br>'
                 'Time: %{x}<br>'
                 'Count: %{y}<br>'
                 '<extra></extra>'
@@ -281,7 +281,7 @@ for idx, domain in enumerate(domains, 1):
         row=idx, col=1
     )
 
-    fig_counts.update_yaxes(title_text='건수', row=idx, col=1)
+    fig_counts.update_yaxes(title_text='Count', row=idx, col=1)
 
 fig_counts.update_layout(
     barmode='group',
@@ -301,7 +301,7 @@ st.plotly_chart(fig_counts, use_container_width=True, config={'scrollZoom': True
 st.markdown('---')
 
 # Fail rate comparison
-st.header('⚠️ 도메인별 실패율 추이')
+st.header('⚠️ Fail Rate by Domain')
 
 fig_fail = go.Figure()
 
@@ -343,20 +343,20 @@ st.plotly_chart(fig_fail, use_container_width=True, config={'scrollZoom': True})
 st.markdown('---')
 
 # Domain comparison bar chart
-st.header('📊 도메인 종합 비교')
+st.header('📊 Domain Comparison')
 
 compare_data = []
 for domain in domains:
     domain_df = df_filtered[df_filtered['domain'] == domain]
     compare_data.append({
         'Domain': domain,
-        '평균 응답(ms)': domain_df['avg_ms'].mean(),
+        'Avg (ms)': domain_df['avg_ms'].mean(),
         'P95 (ms)': domain_df['p95_ms'].mean(),
         'P99 (ms)': domain_df['p99_ms'].mean(),
-        '최대 응답(ms)': domain_df['max_ms'].max(),
-        '총 조회수': domain_df['total'].sum(),
-        '총 실패수': domain_df['fail'].sum(),
-        '실패율(%)': (domain_df['fail'].sum() / domain_df['total'].sum() * 100) if domain_df['total'].sum() > 0 else 0,
+        'Max (ms)': domain_df['max_ms'].max(),
+        'Total Queries': domain_df['total'].sum(),
+        'Total Failures': domain_df['fail'].sum(),
+        'Fail Rate (%)': (domain_df['fail'].sum() / domain_df['total'].sum() * 100) if domain_df['total'].sum() > 0 else 0,
     })
 
 compare_df = pd.DataFrame(compare_data)
@@ -365,11 +365,11 @@ col1, col2 = st.columns(2)
 
 with col1:
     fig_compare_resp = go.Figure()
-    fig_compare_resp.add_trace(go.Bar(name='평균', x=compare_df['Domain'], y=compare_df['평균 응답(ms)'], marker_color='#1f77b4'))
+    fig_compare_resp.add_trace(go.Bar(name='Avg', x=compare_df['Domain'], y=compare_df['Avg (ms)'], marker_color='#1f77b4'))
     fig_compare_resp.add_trace(go.Bar(name='P95', x=compare_df['Domain'], y=compare_df['P95 (ms)'], marker_color='#ff7f0e'))
     fig_compare_resp.add_trace(go.Bar(name='P99', x=compare_df['Domain'], y=compare_df['P99 (ms)'], marker_color='#d62728'))
     fig_compare_resp.update_layout(
-        title='도메인별 응답시간 비교',
+        title='Response Time Comparison',
         barmode='group',
         yaxis_title='ms',
         xaxis=dict(type='category'),
@@ -379,12 +379,12 @@ with col1:
 
 with col2:
     fig_compare_count = go.Figure()
-    fig_compare_count.add_trace(go.Bar(name='성공', x=compare_df['Domain'], y=compare_df['총 조회수'] - compare_df['총 실패수'], marker_color='#2ca02c'))
-    fig_compare_count.add_trace(go.Bar(name='실패', x=compare_df['Domain'], y=compare_df['총 실패수'], marker_color='#d62728'))
+    fig_compare_count.add_trace(go.Bar(name='Success', x=compare_df['Domain'], y=compare_df['Total Queries'] - compare_df['Total Failures'], marker_color='#2ca02c'))
+    fig_compare_count.add_trace(go.Bar(name='Fail', x=compare_df['Domain'], y=compare_df['Total Failures'], marker_color='#d62728'))
     fig_compare_count.update_layout(
-        title='도메인별 조회수 비교',
+        title='Query Count Comparison',
         barmode='stack',
-        yaxis_title='건수',
+        yaxis_title='Count',
         xaxis=dict(type='category'),
         height=400,
     )
@@ -392,7 +392,7 @@ with col2:
 
 # Detail table
 st.markdown('---')
-st.header('📋 상세 데이터')
+st.header('📋 Detailed Data')
 
 display_cols = ['timestamp', 'domain', 'success', 'fail', 'total', 'fail_rate', 'min_ms', 'avg_ms', 'max_ms', 'p95_ms', 'p99_ms']
 available_cols = [col for col in display_cols if col in df_filtered.columns]

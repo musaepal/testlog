@@ -151,13 +151,13 @@ def generate_dns_report(df_filtered, domains, figures, compare_df):
             domain_name = domain_name[:22] + '...'
         rows.append([
             domain_name,
-            f'{row["평균 응답(ms)"]:.1f}',
+            f'{row["Avg (ms)"]:.1f}',
             f'{row["P95 (ms)"]:.1f}',
             f'{row["P99 (ms)"]:.1f}',
-            f'{row["최대 응답(ms)"]:.0f}',
-            f'{int(row["총 조회수"]):,}',
-            f'{int(row["총 실패수"]):,}',
-            f'{row["실패율(%)"]:.2f}%',
+            f'{row["Max (ms)"]:.0f}',
+            f'{int(row["Total Queries"]):,}',
+            f'{int(row["Total Failures"]):,}',
+            f'{row["Fail Rate (%)"]:.2f}%',
         ])
     col_widths = [45, 18, 18, 18, 18, 25, 22, 22]
     pdf.add_summary_table(headers, rows, col_widths)

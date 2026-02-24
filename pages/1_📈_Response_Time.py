@@ -9,17 +9,17 @@ import plotly.express as px
 from datetime import datetime
 
 st.set_page_config(
-    page_title='요청 응답 시간 분석',
+    page_title='Response Time Analysis',
     page_icon='📈',
     layout='wide'
 )
 
-st.title('📈 요청 응답 시간 분석')
-st.markdown('시간대별 응답 시간 메트릭(rt, uct, uht, urt)을 분석합니다.')
+st.title('📈 Response Time Analysis')
+st.markdown('Analyze response time metrics (rt, uct, uht, urt) over time.')
 
 # Check if data exists
 if 'log_data' not in st.session_state or st.session_state['log_data'].empty:
-    st.warning('⚠️ 데이터가 로드되지 않았습니다. 홈페이지에서 로그 파일을 업로드해주세요.')
+    st.warning('⚠️ No data loaded. Please upload a log file from the home page.')
     st.stop()
 
 df = st.session_state['log_data'].copy()
@@ -148,7 +148,7 @@ if selected_metrics:
                 row=idx,
                 col=1
             )
-            fig.update_yaxes(title_text='초 (s)', row=idx, col=1)
+            fig.update_yaxes(title_text='Seconds (s)', row=idx, col=1)
 
         fig.update_layout(
             title='Performance Metrics Timeline',
@@ -165,7 +165,7 @@ if selected_metrics:
         )
 
         st.plotly_chart(fig, use_container_width=True, config={'scrollZoom': True})
-        st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
+        st.caption('💡 Drag to zoom | Use slider to adjust range | Double-click to reset')
 else:
     st.info('Select at least one metric from the sidebar')
 

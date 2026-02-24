@@ -83,11 +83,11 @@ def parse_dns_monitor_log(log_content: str) -> pd.DataFrame:
     """Parse DNS monitor log and extract performance metrics.
 
     Expected format (pairs of lines per domain per timestamp):
-    [2026-02-23 09:00:12] [INFO] [domain.com] (성공수/실패수/전체조회수)
+    [2026-02-23 09:00:12] [INFO] [domain.com] (success/fail/total)
     [2026-02-23 09:00:12] [INFO] [domain.com] 응답시간 통계 - 최소 : 0ms, 평균 : 10ms, 최대 15ms, P95:11ms, P99: 13ms
     """
 
-    # Pattern for count line: (성공/실패/전체)
+    # Pattern for count line: (success/fail/total)
     count_pattern = re.compile(
         r'\[(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\]\s+'
         r'\[INFO\]\s+'

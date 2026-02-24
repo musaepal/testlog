@@ -9,24 +9,24 @@ import plotly.express as px
 from datetime import datetime
 
 st.set_page_config(
-    page_title='시간당 요청수 분석',
+    page_title='Request Count Analysis',
     page_icon='📊',
     layout='wide'
 )
 
-st.title('📊 시간당 요청수 분석')
-st.markdown('시간대별 요청 건수 및 트래픽 패턴을 분석합니다.')
+st.title('📊 Request Count Analysis')
+st.markdown('Analyze request counts and traffic patterns over time.')
 
 # Check if data exists
 if 'log_data' not in st.session_state or st.session_state['log_data'].empty:
-    st.warning('⚠️ 데이터가 로드되지 않았습니다. 홈페이지에서 로그 파일을 업로드해주세요.')
+    st.warning('⚠️ No data loaded. Please upload a log file from the home page.')
     st.stop()
 
 df = st.session_state['log_data'].copy()
 
 # Check if timestamp exists
 if 'timestamp' not in df.columns or df['timestamp'].isna().all():
-    st.error('❌ 타임스탬프 데이터가 없습니다.')
+    st.error('❌ No timestamp data available.')
     st.stop()
 
 st.markdown('---')
@@ -100,25 +100,25 @@ df_filtered['minute'] = df_filtered['timestamp'].dt.floor('min')
 minute_counts = df_filtered.groupby('minute').size()
 
 with col1:
-    st.metric('총 요청 수', f'{len(df_filtered):,}')
+    st.metric('Total Requests', f'{len(df_filtered):,}')
 
 with col2:
     avg_per_minute = minute_counts.mean()
-    st.metric('평균 분당 요청', f'{avg_per_minute:.1f}')
+    st.metric('Avg Req/Min', f'{avg_per_minute:.1f}')
 
 with col3:
     max_per_minute = minute_counts.max()
-    st.metric('최대 분당 요청', f'{max_per_minute:.0f}')
+    st.metric('Max Req/Min', f'{max_per_minute:.0f}')
 
 with col4:
     if len(hourly_counts) > 0:
         peak_hour = hourly_counts.idxmax()
-        st.metric('피크 시간', peak_hour.strftime('%Y-%m-%d %H:00'))
+        st.metric('Peak Time', peak_hour.strftime('%Y-%m-%d %H:00'))
 
 st.markdown('---')
 
 # Requests over time
-st.header('📈 시간대별 요청 수')
+st.header('📈 Requests Over Time')
 
 time_counts = df_filtered.groupby('time_bucket').size().reset_index(name='count')
 
@@ -153,7 +153,7 @@ fig_timeline.update_layout(
 )
 
 st.plotly_chart(fig_timeline, use_container_width=True, config={'scrollZoom': True})
-st.caption('💡 마우스로 드래그하여 확대 | 하단 슬라이더로 범위 조절 | 더블클릭으로 초기화')
+st.caption('💡 Drag to zoom | Use slider to adjust range | Double-click to reset')
 
 # Two columns for additional charts
 col1, col2 = st.columns(2)
@@ -236,7 +236,7 @@ with col2:
 st.markdown('---')
 
 # Hourly pattern (hour of day)
-st.header('🕐 시간대별 트래픽 패턴')
+st.header('🕐 Traffic Pattern by Hour')
 
 hour_pattern = df_filtered.groupby('hour_of_day').size().reset_index(name='count')
 
