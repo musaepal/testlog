@@ -1,42 +1,42 @@
 [2026-02-23 09:00:12] [INFO] [api.example.com] (1523/12/1535)
-[2026-02-23 09:00:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 8ms, 최대 45ms, P95:18ms, P99: 32ms
+[2026-02-23 09:00:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 1ms, 평균: 8ms, 최대: 45ms, P95: 18ms, P99: 32ms
 [2026-02-23 09:00:12] [INFO] [cdn.example.com] (2841/3/2844)
-[2026-02-23 09:00:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 0ms, 평균 : 5ms, 최대 28ms, P95:12ms, P99: 20ms
+[2026-02-23 09:00:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 0ms, 평균: 5ms, 최대: 28ms, P95: 12ms, P99: 20ms
 [2026-02-23 09:00:12] [INFO] [db.internal.net] (892/45/937)
-[2026-02-23 09:00:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 2ms, 평균 : 15ms, 최대 120ms, P95:45ms, P99: 85ms
+[2026-02-23 09:00:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 2ms, 평균: 15ms, 최대: 120ms, P95: 45ms, P99: 85ms
 [2026-02-23 09:05:12] [INFO] [api.example.com] (1489/18/1507)
-[2026-02-23 09:05:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 9ms, 최대 52ms, P95:20ms, P99: 38ms
+[2026-02-23 09:05:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 1ms, 평균: 9ms, 최대: 52ms, P95: 20ms, P99: 38ms
 [2026-02-23 09:05:12] [INFO] [cdn.example.com] (2756/5/2761)
-[2026-02-23 09:05:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 0ms, 평균 : 4ms, 최대 25ms, P95:11ms, P99: 18ms
+[2026-02-23 09:05:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 0ms, 평균: 4ms, 최대: 25ms, P95: 11ms, P99: 18ms
 [2026-02-23 09:05:12] [INFO] [db.internal.net] (910/52/962)
-[2026-02-23 09:05:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 3ms, 평균 : 18ms, 최대 135ms, P95:50ms, P99: 95ms
+[2026-02-23 09:05:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 3ms, 평균: 18ms, 최대: 135ms, P95: 50ms, P99: 95ms
 [2026-02-23 09:10:12] [INFO] [api.example.com] (1601/8/1609)
-[2026-02-23 09:10:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 7ms, 최대 38ms, P95:16ms, P99: 28ms
+[2026-02-23 09:10:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 1ms, 평균: 7ms, 최대: 38ms, P95: 16ms, P99: 28ms
 [2026-02-23 09:10:12] [INFO] [cdn.example.com] (2923/2/2925)
-[2026-02-23 09:10:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 0ms, 평균 : 4ms, 최대 22ms, P95:10ms, P99: 16ms
+[2026-02-23 09:10:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 0ms, 평균: 4ms, 최대: 22ms, P95: 10ms, P99: 16ms
 [2026-02-23 09:10:12] [INFO] [db.internal.net] (875/38/913)
-[2026-02-23 09:10:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 2ms, 평균 : 14ms, 최대 110ms, P95:42ms, P99: 78ms
+[2026-02-23 09:10:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 2ms, 평균: 14ms, 최대: 110ms, P95: 42ms, P99: 78ms
 [2026-02-23 09:15:12] [INFO] [api.example.com] (1555/15/1570)
-[2026-02-23 09:15:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 10ms, 최대 58ms, P95:22ms, P99: 40ms
+[2026-02-23 09:15:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 1ms, 평균: 10ms, 최대: 58ms, P95: 22ms, P99: 40ms
 [2026-02-23 09:15:12] [INFO] [cdn.example.com] (2680/7/2687)
-[2026-02-23 09:15:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 6ms, 최대 32ms, P95:14ms, P99: 23ms
+[2026-02-23 09:15:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 1ms, 평균: 6ms, 최대: 32ms, P95: 14ms, P99: 23ms
 [2026-02-23 09:15:12] [INFO] [db.internal.net] (920/60/980)
-[2026-02-23 09:15:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 3ms, 평균 : 20ms, 최대 150ms, P95:55ms, P99: 105ms
+[2026-02-23 09:15:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 3ms, 평균: 20ms, 최대: 150ms, P95: 55ms, P99: 105ms
 [2026-02-23 09:20:12] [INFO] [api.example.com] (1478/10/1488)
-[2026-02-23 09:20:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 8ms, 최대 42ms, P95:17ms, P99: 30ms
+[2026-02-23 09:20:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 1ms, 평균: 8ms, 최대: 42ms, P95: 17ms, P99: 30ms
 [2026-02-23 09:20:12] [INFO] [cdn.example.com] (2800/4/2804)
-[2026-02-23 09:20:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 0ms, 평균 : 5ms, 최대 26ms, P95:11ms, P99: 19ms
+[2026-02-23 09:20:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 0ms, 평균: 5ms, 최대: 26ms, P95: 11ms, P99: 19ms
 [2026-02-23 09:20:12] [INFO] [db.internal.net] (885/42/927)
-[2026-02-23 09:20:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 2ms, 평균 : 16ms, 최대 125ms, P95:48ms, P99: 88ms
+[2026-02-23 09:20:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 2ms, 평균: 16ms, 최대: 125ms, P95: 48ms, P99: 88ms
 [2026-02-23 09:25:12] [INFO] [api.example.com] (1612/5/1617)
-[2026-02-23 09:25:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 0ms, 평균 : 6ms, 최대 35ms, P95:14ms, P99: 25ms
+[2026-02-23 09:25:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 0ms, 평균: 6ms, 최대: 35ms, P95: 14ms, P99: 25ms
 [2026-02-23 09:25:12] [INFO] [cdn.example.com] (2950/1/2951)
-[2026-02-23 09:25:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 0ms, 평균 : 3ms, 최대 20ms, P95:9ms, P99: 15ms
+[2026-02-23 09:25:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 0ms, 평균: 3ms, 최대: 20ms, P95: 9ms, P99: 15ms
 [2026-02-23 09:25:12] [INFO] [db.internal.net] (860/35/895)
-[2026-02-23 09:25:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 2ms, 평균 : 13ms, 최대 98ms, P95:38ms, P99: 72ms
+[2026-02-23 09:25:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 2ms, 평균: 13ms, 최대: 98ms, P95: 38ms, P99: 72ms
 [2026-02-23 09:30:12] [INFO] [api.example.com] (1530/20/1550)
-[2026-02-23 09:30:12] [INFO] [api.example.com] 응답시간 통계 - 최소 : 2ms, 평균 : 11ms, 최대 65ms, P95:25ms, P99: 45ms
+[2026-02-23 09:30:12] [INFO] [api.example.com] 응답시간 통계 - 최소: 2ms, 평균: 11ms, 최대: 65ms, P95: 25ms, P99: 45ms
 [2026-02-23 09:30:12] [INFO] [cdn.example.com] (2700/8/2708)
-[2026-02-23 09:30:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소 : 1ms, 평균 : 7ms, 최대 35ms, P95:15ms, P99: 25ms
+[2026-02-23 09:30:12] [INFO] [cdn.example.com] 응답시간 통계 - 최소: 1ms, 평균: 7ms, 최대: 35ms, P95: 15ms, P99: 25ms
 [2026-02-23 09:30:12] [INFO] [db.internal.net] (940/68/1008)
-[2026-02-23 09:30:12] [INFO] [db.internal.net] 응답시간 통계 - 최소 : 4ms, 평균 : 22ms, 최대 165ms, P95:60ms, P99: 115ms
+[2026-02-23 09:30:12] [INFO] [db.internal.net] 응답시간 통계 - 최소: 4ms, 평균: 22ms, 최대: 165ms, P95: 60ms, P99: 115ms

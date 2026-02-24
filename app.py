@@ -71,27 +71,41 @@ with st.sidebar:
 # Process and store log data in session state
 if uploaded_file is not None:
     content = uploaded_file.read().decode('utf-8')
+    total_lines = len([l for l in content.strip().split('\n') if l.strip()])
     if log_type == 'DNS Monitor Log':
         df = parse_dns_monitor_log(content)
-        st.session_state['dns_data'] = df
-        st.session_state['active_log_type'] = 'dns'
-        st.sidebar.success(f'✅ Loaded {len(df)} DNS log entries')
+        if df.empty:
+            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 DNS 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+        else:
+            st.session_state['dns_data'] = df
+            st.session_state['active_log_type'] = 'dns'
+            st.sidebar.success(f'✅ Loaded {len(df)} DNS log entries (from {total_lines} lines)')
     else:
         df = parse_access_log(content)
-        st.session_state['log_data'] = df
-        st.session_state['active_log_type'] = 'web'
-        st.sidebar.success(f'✅ Loaded {len(df)} log entries')
+        if df.empty:
+            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 Web Access 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+        else:
+            st.session_state['log_data'] = df
+            st.session_state['active_log_type'] = 'web'
+            st.sidebar.success(f'✅ Loaded {len(df)} log entries (from {total_lines} lines)')
 elif log_text.strip():
+    total_lines = len([l for l in log_text.strip().split('\n') if l.strip()])
     if log_type == 'DNS Monitor Log':
         df = parse_dns_monitor_log(log_text)
-        st.session_state['dns_data'] = df
-        st.session_state['active_log_type'] = 'dns'
-        st.sidebar.success(f'✅ Parsed {len(df)} DNS log entries')
+        if df.empty:
+            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 DNS 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+        else:
+            st.session_state['dns_data'] = df
+            st.session_state['active_log_type'] = 'dns'
+            st.sidebar.success(f'✅ Parsed {len(df)} DNS log entries (from {total_lines} lines)')
     else:
         df = parse_access_log(log_text)
-        st.session_state['log_data'] = df
-        st.session_state['active_log_type'] = 'web'
-        st.sidebar.success(f'✅ Parsed {len(df)} log entries')
+        if df.empty:
+            st.sidebar.error(f'❌ 파싱 오류: {total_lines}개 라인에서 Web Access 로그를 파싱하지 못했습니다. 로그 형식을 확인해주세요.')
+        else:
+            st.session_state['log_data'] = df
+            st.session_state['active_log_type'] = 'web'
+            st.sidebar.success(f'✅ Parsed {len(df)} log entries (from {total_lines} lines)')
 
 # Determine what data is available
 has_web = 'log_data' in st.session_state and not st.session_state['log_data'].empty

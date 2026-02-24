@@ -103,7 +103,7 @@ def parse_dns_monitor_log(log_content: str) -> pd.DataFrame:
         r'응답시간\s+통계\s*-\s*'
         r'최소\s*:\s*(\d+)\s*ms\s*,\s*'
         r'평균\s*:\s*(\d+)\s*ms\s*,\s*'
-        r'최대\s*(\d+)\s*ms\s*,\s*'
+        r'최대\s*:?\s*(\d+)\s*ms\s*,\s*'
         r'P95\s*:\s*(\d+)\s*ms\s*,\s*'
         r'P99\s*:\s*(\d+)\s*ms'
     )
