@@ -144,6 +144,16 @@ def generate_dns_report(df_filtered, domains, figures, compare_df):
     # 2. Domain Summary
     pdf.section_title('2. Domain Summary')
     headers = ['Domain', 'Avg(ms)', 'P95(ms)', 'P99(ms)', 'Max(ms)', 'Total', 'Fail', 'Fail%']
+    # Column name mapping for backward compatibility
+    col = compare_df.columns.tolist()
+    avg_col = next((c for c in col if 'avg' in c.lower() or '평균' in c), col[1] if len(col) > 1 else 'Avg (ms)')
+    p95_col = next((c for c in col if 'p95' in c.lower()), 'P95 (ms)')
+    p99_col = next((c for c in col if 'p99' in c.lower()), 'P99 (ms)')
+    max_col = next((c for c in col if 'max' in c.lower() or '최대' in c), 'Max (ms)')
+    total_col = next((c for c in col if 'total q' in c.lower() or '총 조회' in c), 'Total Queries')
+    fail_col = next((c for c in col if 'total f' in c.lower() or '총 실패' in c), 'Total Failures')
+    rate_col = next((c for c in col if 'fail r' in c.lower() or '실패율' in c), 'Fail Rate (%)')
+
     rows = []
     for _, row in compare_df.iterrows():
         domain_name = str(row['Domain'])
@@ -151,13 +161,13 @@ def generate_dns_report(df_filtered, domains, figures, compare_df):
             domain_name = domain_name[:22] + '...'
         rows.append([
             domain_name,
-            f'{row["Avg (ms)"]:.1f}',
-            f'{row["P95 (ms)"]:.1f}',
-            f'{row["P99 (ms)"]:.1f}',
-            f'{row["Max (ms)"]:.0f}',
-            f'{int(row["Total Queries"]):,}',
-            f'{int(row["Total Failures"]):,}',
-            f'{row["Fail Rate (%)"]:.2f}%',
+            f'{row[avg_col]:.1f}',
+            f'{row[p95_col]:.1f}',
+            f'{row[p99_col]:.1f}',
+            f'{row[max_col]:.0f}',
+            f'{int(row[total_col]):,}',
+            f'{int(row[fail_col]):,}',
+            f'{row[rate_col]:.2f}%',
         ])
     col_widths = [45, 18, 18, 18, 18, 25, 22, 22]
     pdf.add_summary_table(headers, rows, col_widths)
